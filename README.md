@@ -121,3 +121,13 @@ Run LangSmith eval:
 ```bash
 .venv/bin/python scripts/run_langsmith_eval.py
 ```
+
+## Generating Submission Artifacts
+
+JSONL remains the source of truth for eval runs. To generate human-readable Excel and Word files for Week 4 submission, run:
+
+```bash
+python scripts/generate_submission_artifacts.py
+```
+
+The generated files are saved under `submissions/`, including the golden dataset workbook, baseline and post-improvement eval workbooks, failure analysis workbook, improvement log workbook, final evaluation report DOCX, and Loom walkthrough script DOCX.

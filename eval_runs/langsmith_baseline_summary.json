@@ -1,0 +1,13 @@
+{
+  "average_latency_seconds": 0.012368825,
+  "case_count": 40,
+  "citation_coverage": 1.0,
+  "decision_accuracy": 1.0,
+  "escalation_accuracy": 1.0,
+  "failure_count": 0,
+  "faithfulness_llm_judge": 1.0,
+  "missing_info_f1": 1.0,
+  "policy_section_recall": 1.0,
+  "reason_code_accuracy": 1.0,
+  "schema_validity": 1.0
+}

@@ -44,7 +44,9 @@ Each row includes customer message, order context, expected decision, expected r
 
 ## 6. LangSmith Instrumentation Summary
 
-LangSmith support was added but LangSmith runs were not available in this environment because the `langsmith` package and `LANGCHAIN_API_KEY` were not configured at run time. The instrumentation plan supports these spans:
+LangSmith support was added for the full backend agent run and the major pipeline steps. The available `eval_runs/langsmith_baseline_summary.json` artifact contains 40 traced/evaluated cases with 100.00% scores on the deterministic evaluators and `faithfulness_llm_judge`. A separate `eval_runs/langsmith_post_improvement_summary.json` artifact was not available at report time, so post-improvement LangSmith values remain placeholders.
+
+The tracing plan supports these spans:
 
 - `top_level_agent_run`
 - `intent_extraction_llm`
@@ -60,6 +62,8 @@ LangSmith post-improvement link: `[placeholder: add LangSmith post-improvement e
 
 ## 7. Baseline Results Table
 
+Local baseline results from `eval_runs/local_baseline_summary.json`:
+
 | Metric | Baseline | Pass Bar | Status |
 | --- | ---: | ---: | --- |
 | `decision_accuracy` | 62.50% | >= 90% | Fail |
@@ -71,6 +75,22 @@ LangSmith post-improvement link: `[placeholder: add LangSmith post-improvement e
 | `schema_validity` | 100.00% | Diagnostic | Diagnostic |
 | `average_latency_seconds` | 0.0012s | Diagnostic | Diagnostic |
 | `faithfulness_llm_judge` | N/A | >= 90% | Not measured |
+| `p95_latency` | N/A | < 8s | Not measured |
+| `cost_per_run` | N/A | < $0.05 | Not measured |
+
+Available LangSmith baseline artifact from `eval_runs/langsmith_baseline_summary.json`:
+
+| Metric | LangSmith Baseline Artifact | Pass Bar | Status |
+| --- | ---: | ---: | --- |
+| `decision_accuracy` | 100.00% | >= 90% | Pass |
+| `reason_code_accuracy` | 100.00% | >= 85% | Pass |
+| `missing_info_f1` | 100.00% | >= 85% | Pass |
+| `escalation_accuracy` | 100.00% | >= 95% | Pass |
+| `citation_coverage` | 100.00% | = 100% | Pass |
+| `policy_section_recall` | 100.00% | Diagnostic | Diagnostic |
+| `schema_validity` | 100.00% | Diagnostic | Diagnostic |
+| `faithfulness_llm_judge` | 100.00% | >= 90% | Pass |
+| `average_latency_seconds` | 0.0124s | Diagnostic | Diagnostic |
 | `p95_latency` | N/A | < 8s | Not measured |
 | `cost_per_run` | N/A | < $0.05 | Not measured |
 
@@ -97,6 +117,8 @@ LangSmith post-improvement link: `[placeholder: add LangSmith post-improvement e
 
 ## 10. Post-Improvement Results Table
 
+Local post-improvement results from `eval_runs/local_post_improvement_summary.json`:
+
 | Metric | Post-Improvement | Pass Bar | Status |
 | --- | ---: | ---: | --- |
 | `decision_accuracy` | 100.00% | >= 90% | Pass |
@@ -111,6 +133,8 @@ LangSmith post-improvement link: `[placeholder: add LangSmith post-improvement e
 | `p95_latency` | N/A | < 8s | Not measured |
 | `cost_per_run` | N/A | < $0.05 | Not measured |
 
+LangSmith post-improvement results were not available as a separate artifact at report time.
+
 ## 11. Delta Table
 
 | Metric | Baseline | Post-improvement | Delta | Pass bar | Status |
@@ -121,7 +145,7 @@ LangSmith post-improvement link: `[placeholder: add LangSmith post-improvement e
 | `escalation_accuracy` | 87.50% | 100.00% | +12.50% | >= 95% | Pass |
 | `citation_coverage` | 100.00% | 100.00% | +0.00% | = 100% | Pass |
 | `policy_section_recall` | 60.00% | 100.00% | +40.00% | Diagnostic | Diagnostic |
-| `faithfulness_llm_judge` | N/A | N/A | N/A | >= 90% | Not measured |
+| `faithfulness_llm_judge` | 100.00% LangSmith artifact; N/A local | N/A post-improvement LangSmith | N/A | >= 90% | Baseline artifact pass; post not measured |
 | `schema_validity` | 100.00% | 100.00% | +0.00% | Diagnostic | Diagnostic |
 | `p95_latency` | N/A | N/A | N/A | < 8s | Not measured |
 | `cost_per_run` | N/A | N/A | N/A | < $0.05 | Not measured |
@@ -137,7 +161,8 @@ LangSmith post-improvement link: `[placeholder: add LangSmith post-improvement e
 
 ## 13. What Did Not Improve
 
-- LangSmith faithfulness, p95 latency, and cost-per-run were not measured because LangSmith credentials/runtime were unavailable.
+- A separate LangSmith post-improvement run was not available, so faithfulness delta was not measured.
+- p95 latency and cost-per-run were not measured in the available artifacts.
 - Citation coverage and schema validity had no room to improve because both started at 100%.
 - Local eval uses deterministic agent execution, so it does not measure the full OpenAI-backed three-call path or model-cost behavior.
 
@@ -145,13 +170,13 @@ LangSmith post-improvement link: `[placeholder: add LangSmith post-improvement e
 
 - The local golden dataset is now fully passed, which creates risk of overfitting to the 40 labeled cases.
 - Full-corpus retrieval improves recall but may make traces and the Streamlit evidence section noisier.
-- Faithfulness still needs LLM-judge validation against actual generated final answers.
-- LangSmith cost and latency need a real traced run with credentials.
+- Faithfulness needs a paired baseline/post-improvement LangSmith comparison to produce a true delta.
+- LangSmith p95 latency and model cost need to be captured in future traced runs.
 - Additional unseen adversarial, policy-conflict, and multi-item cases should be added before production use.
 
 ## 15. What I Would Do Next
 
-1. Install/configure LangSmith and run baseline/post-improvement experiments using the same dataset.
+1. Run or export a separate LangSmith post-improvement experiment using the same dataset.
 2. Add 10-20 fresh holdout cases that were not used during improvement.
 3. Run the OpenAI-backed three-call flow under LangSmith to measure model-token cost and answer faithfulness.
 4. Reduce full-corpus retrieval noise with a deterministic policy-expansion layer rather than always returning every chunk.
