@@ -1,0 +1,160 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Northstar Commerce Return Policy Agent Golden Dataset Case",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "dataset_split",
+    "case_group",
+    "scenario_type",
+    "customer_message",
+    "order_context",
+    "expected",
+    "label_notes"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^golden_[0-9]{3}$"
+    },
+    "dataset_split": {
+      "type": "string",
+      "enum": ["golden"]
+    },
+    "case_group": {
+      "type": "string",
+      "enum": ["happy_path", "edge_case", "known_failure", "adversarial"]
+    },
+    "scenario_type": {
+      "type": "string",
+      "minLength": 1
+    },
+    "customer_message": {
+      "type": "string",
+      "minLength": 1
+    },
+    "order_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "order_date",
+        "delivery_date",
+        "item_category",
+        "item_condition",
+        "final_sale",
+        "order_value",
+        "proof_of_purchase",
+        "order_number"
+      ],
+      "properties": {
+        "order_date": {
+          "type": ["string", "null"],
+          "format": "date"
+        },
+        "delivery_date": {
+          "type": ["string", "null"],
+          "format": "date"
+        },
+        "item_category": {
+          "type": ["string", "null"]
+        },
+        "item_condition": {
+          "type": ["string", "null"]
+        },
+        "final_sale": {
+          "type": ["boolean", "null"]
+        },
+        "order_value": {
+          "type": ["number", "null"],
+          "minimum": 0
+        },
+        "proof_of_purchase": {
+          "type": ["string", "null"]
+        },
+        "order_number": {
+          "type": ["string", "null"]
+        }
+      }
+    },
+    "expected": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "decision",
+        "reason_code",
+        "missing_info",
+        "escalate",
+        "policy_ids",
+        "answer_requirements",
+        "answer_must_not_include"
+      ],
+      "properties": {
+        "decision": {
+          "type": "string",
+          "enum": [
+            "eligible_return",
+            "not_eligible",
+            "eligible_exchange",
+            "ask_for_info",
+            "escalate"
+          ]
+        },
+        "reason_code": {
+          "type": "string",
+          "enum": [
+            "standard_30_day",
+            "outside_return_window",
+            "final_sale",
+            "damaged_item",
+            "wrong_item",
+            "missing_item",
+            "missing_order_number",
+            "no_proof_of_purchase",
+            "shipping_fee",
+            "gift_return",
+            "exception_request",
+            "legal_threat",
+            "fraud_concern",
+            "unclear"
+          ]
+        },
+        "missing_info": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "escalate": {
+          "type": "boolean"
+        },
+        "policy_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^POLICY:[A-Z0-9_]+$"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "answer_requirements": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "answer_must_not_include": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "label_notes": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

@@ -1,0 +1,389 @@
+{
+  "clusters": {
+    "final_answer_hallucinated_or_overpromised": {
+      "case_ids": [],
+      "category": "Final answer hallucinated or overpromised",
+      "count": 0,
+      "estimated_impact": "Unknown until judged; likely medium if answer wording is evaluated strictly.",
+      "example_customer_message": null,
+      "expected_output": null,
+      "likely_root_cause": "No automated faithfulness artifact is available in the local baseline. This cluster is not measured until LangSmith/LLM judge output exists.",
+      "predicted_output": null,
+      "recommended_improvement": "Run LangSmith faithfulness judge after credentials are configured; keep refund-promise and exception-approval bans in the final-answer prompt/tests."
+    },
+    "incorrect_eligibility_decision": {
+      "case_ids": [
+        "RET-006",
+        "RET-009",
+        "RET-014",
+        "RET-021",
+        "RET-023",
+        "RET-024",
+        "RET-026",
+        "RET-027",
+        "RET-029",
+        "RET-030",
+        "RET-031",
+        "RET-032",
+        "RET-034",
+        "RET-037",
+        "RET-038"
+      ],
+      "category": "Incorrect eligibility decision",
+      "count": 15,
+      "estimated_impact": "High: directly improves decision_accuracy and reduces unsafe or unhelpful outcomes across many edge/known-failure cases.",
+      "example_customer_message": "If I return an eligible dress because I changed my mind, will Northstar refund return shipping?",
+      "expected_output": {
+        "decision": "not_eligible",
+        "escalate": false,
+        "missing_info": [],
+        "policy_sections": [
+          "POLICY:RETURN_SHIPPING_CUSTOMER_REASONS"
+        ],
+        "reason_code": "shipping_fee"
+      },
+      "likely_root_cause": "Decision logic overuses generic ask-for-info paths for outside-window, used-condition, refund-method, unsupported-channel, and damaged/wrong-item variants instead of applying conclusive policy outcomes or support-review routing.",
+      "predicted_output": {
+        "citations": [
+          "04_refunds_and_shipping_fees.md [POLICY:RETURN_SHIPPING_CUSTOMER_REASONS]",
+          "04_refunds_and_shipping_fees.md [POLICY:RETURN_SHIPPING_NORTHSTAR_REASONS]"
+        ],
+        "customer_answer": "I need the return reason before I can determine whether return shipping may be refunded.",
+        "decision": "ask_for_info",
+        "escalate": false,
+        "missing_info": [
+          "return_reason"
+        ],
+        "policy_sections_used": [
+          "POLICY:RETURN_SHIPPING_CUSTOMER_REASONS",
+          "POLICY:RETURN_SHIPPING_NORTHSTAR_REASONS"
+        ],
+        "reason_code": "shipping_fee"
+      },
+      "recommended_improvement": "Add targeted deterministic decision/validator rules for outside-window, used-condition, refund-method, digital/personalized restrictions, unsupported channels, and damaged/wrong/missing review paths."
+    },
+    "incorrect_reason_code": {
+      "case_ids": [
+        "RET-009",
+        "RET-014",
+        "RET-021",
+        "RET-023",
+        "RET-024",
+        "RET-025",
+        "RET-026",
+        "RET-027",
+        "RET-030",
+        "RET-031",
+        "RET-032",
+        "RET-036",
+        "RET-037",
+        "RET-038"
+      ],
+      "category": "Incorrect reason code",
+      "count": 14,
+      "estimated_impact": "High: likely largest reason_code_accuracy gain because most decision misses also carry wrong or coarse reason codes.",
+      "example_customer_message": "I ordered the wrong size shirt. It is unworn. Can I return it?",
+      "expected_output": {
+        "decision": "eligible_return",
+        "escalate": false,
+        "missing_info": [],
+        "policy_sections": [
+          "POLICY:STANDARD_RETURN_REASON",
+          "POLICY:STANDARD_RETURN_WINDOW",
+          "POLICY:RETURN_SHIPPING_CUSTOMER_REASONS"
+        ],
+        "reason_code": "standard_30_day"
+      },
+      "likely_root_cause": "Reason-code selection is too coarse: missing delivery date maps to missing_order_number, safety escalations collapse to exception_request, outside-window and used-condition cases are represented as missing info, and issue-specific refund/shipping questions are not distinguished.",
+      "predicted_output": {
+        "citations": [
+          "03_damaged_wrong_missing_items.md [POLICY:DAMAGE_WRONG_MISSING_REVIEW]",
+          "03_damaged_wrong_missing_items.md [POLICY:DAMAGE_WRONG_MISSING_REQUIRED_INFO]"
+        ],
+        "customer_answer": "This issue needs support review. Northstar Commerce requires order details and issue evidence before approving a refund, replacement, or shipping-fee refund.",
+        "decision": "escalate",
+        "escalate": true,
+        "missing_info": [],
+        "policy_sections_used": [
+          "POLICY:DAMAGE_WRONG_MISSING_REVIEW",
+          "POLICY:DAMAGE_WRONG_MISSING_REQUIRED_INFO"
+        ],
+        "reason_code": "wrong_item"
+      },
+      "recommended_improvement": "Normalize reason-code priority and map each branch to the golden taxonomy, including outside_return_window, final_sale, damaged_item, wrong_item, no_proof_of_purchase, shipping_fee, gift_return, exception_request, and unclear."
+    },
+    "latency_or_cost_issue": {
+      "case_ids": [],
+      "category": "Latency or cost issue",
+      "count": 0,
+      "estimated_impact": "Low currently: local latency is roughly 0.001 seconds and no cost is incurred in deterministic baseline.",
+      "example_customer_message": null,
+      "expected_output": null,
+      "likely_root_cause": "No latency issue was observed. Local deterministic average latency is well below the 8 second pass bar; no cost data is available without LangSmith/model usage.",
+      "predicted_output": null,
+      "recommended_improvement": "Track p95 latency and model cost once LangSmith runs are available; no local action needed now."
+    },
+    "missed_escalation": {
+      "case_ids": [
+        "RET-009",
+        "RET-014",
+        "RET-026",
+        "RET-027",
+        "RET-034"
+      ],
+      "category": "Missed escalation",
+      "count": 5,
+      "estimated_impact": "High: improves escalation_accuracy and safety for high-risk cases.",
+      "example_customer_message": "I ordered the wrong size shirt. It is unworn. Can I return it?",
+      "expected_output": {
+        "decision": "eligible_return",
+        "escalate": false,
+        "missing_info": [],
+        "policy_sections": [
+          "POLICY:STANDARD_RETURN_REASON",
+          "POLICY:STANDARD_RETURN_WINDOW",
+          "POLICY:RETURN_SHIPPING_CUSTOMER_REASONS"
+        ],
+        "reason_code": "standard_30_day"
+      },
+      "likely_root_cause": "Escalation pre-checks do not catch some policy-required review cases, especially high-value missing proof, explicit final-sale exception phrasing after final-sale detection, and customer-caused/unclear damage responsibility.",
+      "predicted_output": {
+        "citations": [
+          "03_damaged_wrong_missing_items.md [POLICY:DAMAGE_WRONG_MISSING_REVIEW]",
+          "03_damaged_wrong_missing_items.md [POLICY:DAMAGE_WRONG_MISSING_REQUIRED_INFO]"
+        ],
+        "customer_answer": "This issue needs support review. Northstar Commerce requires order details and issue evidence before approving a refund, replacement, or shipping-fee refund.",
+        "decision": "escalate",
+        "escalate": true,
+        "missing_info": [],
+        "policy_sections_used": [
+          "POLICY:DAMAGE_WRONG_MISSING_REVIEW",
+          "POLICY:DAMAGE_WRONG_MISSING_REQUIRED_INFO"
+        ],
+        "reason_code": "wrong_item"
+      },
+      "recommended_improvement": "Strengthen deterministic guardrails for high-value missing proof, explicit exception requests, customer-caused or unclear damage responsibility, and adversarial final-sale overrides."
+    },
+    "missed_missing_information_request": {
+      "case_ids": [
+        "RET-006",
+        "RET-014",
+        "RET-021",
+        "RET-023",
+        "RET-024",
+        "RET-025",
+        "RET-026",
+        "RET-029",
+        "RET-030",
+        "RET-032",
+        "RET-034",
+        "RET-036",
+        "RET-037",
+        "RET-038"
+      ],
+      "category": "Missed missing-information request",
+      "count": 14,
+      "estimated_impact": "Medium: improves missing_info_f1 and customer follow-up quality, especially for gift/no-proof/damaged-info cases.",
+      "example_customer_message": "If I return an eligible dress because I changed my mind, will Northstar refund return shipping?",
+      "expected_output": {
+        "decision": "not_eligible",
+        "escalate": false,
+        "missing_info": [],
+        "policy_sections": [
+          "POLICY:RETURN_SHIPPING_CUSTOMER_REASONS"
+        ],
+        "reason_code": "shipping_fee"
+      },
+      "likely_root_cause": "Missing-info names from the agent do not align with the golden schema, and some branches escalate immediately even when the dataset expects required facts to be requested first.",
+      "predicted_output": {
+        "citations": [
+          "04_refunds_and_shipping_fees.md [POLICY:RETURN_SHIPPING_CUSTOMER_REASONS]",
+          "04_refunds_and_shipping_fees.md [POLICY:RETURN_SHIPPING_NORTHSTAR_REASONS]"
+        ],
+        "customer_answer": "I need the return reason before I can determine whether return shipping may be refunded.",
+        "decision": "ask_for_info",
+        "escalate": false,
+        "missing_info": [
+          "return_reason"
+        ],
+        "policy_sections_used": [
+          "POLICY:RETURN_SHIPPING_CUSTOMER_REASONS",
+          "POLICY:RETURN_SHIPPING_NORTHSTAR_REASONS"
+        ],
+        "reason_code": "shipping_fee"
+      },
+      "recommended_improvement": "Introduce a canonical missing-info mapper so delivery timing, proof, order number, gift receipt, item-level facts, and issue evidence use stable field names."
+    },
+    "missing_or_invalid_citation": {
+      "case_ids": [],
+      "category": "Missing or invalid citation",
+      "count": 0,
+      "estimated_impact": "Low currently: already at 100% citation_coverage locally.",
+      "example_customer_message": null,
+      "expected_output": null,
+      "likely_root_cause": "No citation coverage failures were observed locally. Citation validation is currently strong for retrieved citation presence.",
+      "predicted_output": null,
+      "recommended_improvement": "Keep current citation validator; add regression tests to preserve 100% citation coverage as behavior changes are made."
+    },
+    "retrieval_missed_relevant_policy_section": {
+      "case_ids": [
+        "RET-004",
+        "RET-007",
+        "RET-009",
+        "RET-010",
+        "RET-014",
+        "RET-015",
+        "RET-017",
+        "RET-019",
+        "RET-023",
+        "RET-024",
+        "RET-026",
+        "RET-027",
+        "RET-028",
+        "RET-030",
+        "RET-031",
+        "RET-032",
+        "RET-033",
+        "RET-034",
+        "RET-035",
+        "RET-036",
+        "RET-038",
+        "RET-040"
+      ],
+      "category": "Retrieval missed relevant policy section",
+      "count": 22,
+      "estimated_impact": "Medium: improves policy_section_recall and provides stronger evidence for LangSmith faithfulness judging.",
+      "example_customer_message": "How long does a refund take after you inspect my returned item?",
+      "expected_output": {
+        "decision": "eligible_return",
+        "escalate": false,
+        "missing_info": [],
+        "policy_sections": [
+          "POLICY:REFUND_TIMING_AFTER_INSPECTION",
+          "POLICY:INSPECTION_REQUIRED_BEFORE_REFUND"
+        ],
+        "reason_code": "standard_30_day"
+      },
+      "likely_root_cause": "Retrieval returns valid chunks, but top-k evidence often omits one or more expected policy sections for multi-policy cases such as exchanges, gifts, shipping fees, and restricted items.",
+      "predicted_output": {
+        "citations": [
+          "01_standard_returns.md [POLICY:STANDARD_RETURN_WINDOW]",
+          "01_standard_returns.md [POLICY:STANDARD_ITEM_CONDITION]",
+          "01_standard_returns.md [POLICY:PROOF_OF_PURCHASE_REQUIRED]"
+        ],
+        "customer_answer": "This item appears eligible for a standard return because it is within 30 days of delivery, in eligible condition, and has proof of purchase.",
+        "decision": "eligible_return",
+        "escalate": false,
+        "missing_info": [],
+        "policy_sections_used": [
+          "POLICY:STANDARD_RETURN_WINDOW",
+          "POLICY:STANDARD_ITEM_CONDITION",
+          "POLICY:PROOF_OF_PURCHASE_REQUIRED"
+        ],
+        "reason_code": "standard_30_day"
+      },
+      "recommended_improvement": "Tune retrieval queries with expected intent terms and add policy-section boost/expansion for multi-policy scenarios so expected support sections appear in retrieved evidence."
+    },
+    "schema_violation": {
+      "case_ids": [],
+      "category": "Schema violation",
+      "count": 0,
+      "estimated_impact": "Low currently: schema_validity is 100%.",
+      "example_customer_message": null,
+      "expected_output": null,
+      "likely_root_cause": "No schema violations were observed. Required output fields are present in all local predictions.",
+      "predicted_output": null,
+      "recommended_improvement": "Keep schema tests and Pydantic model validation unchanged."
+    }
+  },
+  "scenario_type_breakdown": {
+    "adversarial": {
+      "citation_failures": 0,
+      "count": 2,
+      "decision_failures": 0,
+      "escalation_failures": 0,
+      "missing_info_failures": 0,
+      "policy_recall_failures": 1,
+      "reason_failures": 0,
+      "schema_failures": 0
+    },
+    "edge_case": {
+      "citation_failures": 0,
+      "count": 12,
+      "decision_failures": 9,
+      "escalation_failures": 2,
+      "missing_info_failures": 8,
+      "policy_recall_failures": 8,
+      "reason_failures": 9,
+      "schema_failures": 0
+    },
+    "happy_path": {
+      "citation_failures": 0,
+      "count": 20,
+      "decision_failures": 3,
+      "escalation_failures": 2,
+      "missing_info_failures": 2,
+      "policy_recall_failures": 8,
+      "reason_failures": 2,
+      "schema_failures": 0
+    },
+    "known_failure": {
+      "citation_failures": 0,
+      "count": 6,
+      "decision_failures": 3,
+      "escalation_failures": 1,
+      "missing_info_failures": 4,
+      "policy_recall_failures": 5,
+      "reason_failures": 3,
+      "schema_failures": 0
+    }
+  },
+  "source_files": {
+    "langsmith_failures_available": false,
+    "langsmith_summary_available": false,
+    "local_predictions": "eval_runs/local_baseline_predictions.jsonl",
+    "local_summary": "eval_runs/local_baseline_summary.json"
+  },
+  "summary_metrics": {
+    "average_latency_seconds": 0.001214625,
+    "case_count": 40,
+    "citation_coverage": 1.0,
+    "decision_accuracy": 0.625,
+    "escalation_accuracy": 0.875,
+    "missing_info_f1": 0.6625,
+    "policy_section_recall": 0.6,
+    "reason_code_accuracy": 0.65,
+    "schema_validity": 1.0
+  },
+  "top_3_improvement_opportunities": [
+    {
+      "addresses_clusters": [
+        "Incorrect eligibility decision",
+        "Incorrect reason code",
+        "Missed escalation"
+      ],
+      "affected_case_count_estimate": 17,
+      "opportunity": "Fix deterministic decision and reason-code priority for edge/known-failure cases",
+      "rank": 1,
+      "why_first": "These failures directly block decision_accuracy, reason_code_accuracy, and escalation_accuracy pass bars and include the highest-risk cases."
+    },
+    {
+      "addresses_clusters": [
+        "Missed missing-information request"
+      ],
+      "affected_case_count_estimate": 14,
+      "opportunity": "Canonicalize missing-info field names and branch behavior",
+      "rank": 2,
+      "why_first": "Missing-info F1 is below pass bar and several cases fail because labels and agent fields use different names or the agent answers/escalates before asking required facts."
+    },
+    {
+      "addresses_clusters": [
+        "Retrieval missed relevant policy section"
+      ],
+      "affected_case_count_estimate": 22,
+      "opportunity": "Improve retrieval recall for multi-policy scenarios",
+      "rank": 3,
+      "why_first": "Citation coverage is perfect, but policy_section_recall is only 60%; stronger retrieved evidence will help LangSmith faithfulness and policy-grounding evaluations."
+    }
+  ]
+}

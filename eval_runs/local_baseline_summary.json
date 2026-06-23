@@ -1,0 +1,11 @@
+{
+  "average_latency_seconds": 0.001214625,
+  "case_count": 40,
+  "citation_coverage": 1.0,
+  "decision_accuracy": 0.625,
+  "escalation_accuracy": 0.875,
+  "missing_info_f1": 0.6625,
+  "policy_section_recall": 0.6,
+  "reason_code_accuracy": 0.65,
+  "schema_validity": 1.0
+}
